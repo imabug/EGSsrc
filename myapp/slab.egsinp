@@ -1,0 +1,96 @@
+# Simple slab simulation
+
+# RUN CONTROL
+:start run control:
+  # Number of histories to simulate
+  ncase = 1e5
+:stop run control:
+
+# GEOMETRY
+:start geometry definition:
+  :start geometry:
+    name = slab
+    library = egs_ndgeometry
+    type = EGS_XYZGeometry
+    x-planes = -5, 5
+    y-planes = -5, 5
+    z-planes = -10, 0, 0.1, 10
+    :start media input:
+      # media[0] = vacuum
+      # media[1] = tantalum
+      media = vacuum water
+      # Set region 1 to medium 1 (tantalum).  Others default to medium 0 (vacuum)
+      set medium = 1 1
+    :stop media input:
+  :stop geometry:
+  simulation geometry = slab
+:stop geometry definition
+
+# MEDIA
+:start media definition:
+  # Cutoff energies in MeV
+  ae = 0.521    # lowest energy for electrons
+  ap = 0.01      # lowest energy for photons
+  ue = 50.511    # max energy for electrons
+  up = 50        # max energy for photons
+
+  # Tantalum
+  :start tantalum:
+    density correction file = tantalum
+  :stop tantalum:
+
+  # Lead
+  :start lead:
+    density correction file = lead
+  :stop lead:
+
+  # Water
+  :start water:
+    density correction file = water_liquid
+  :stop water:
+:stop media definition:
+
+# SOURCE
+:start source definition:
+  # Define a pencil beam
+  :start source:
+    name = pencil_beam
+    library = egs_parallel_beam
+    charge = -1
+    direction = 0 0 1
+    :start spectrum:
+      type = monoenergetic
+      energy = 20 # MeV
+    :stop spectrum:
+    :start shape:
+      type = point
+      position = 0 0 -10
+    :stop shape:
+  :stop source:
+  simulation source = pencil_beam
+:stop source definition:
+
+# VIEWER CONTROL
+:start view control:
+  # Assign some colours to use in egs_view
+  set color = lead 120 120 200 200
+  set color = tantalum 120 255 120 255
+  set color = water 0 220 255 200
+:stop view control:
+
+# AUSGAB objects
+:start ausgab object definition:
+  # Particle tracks
+  :start ausgab object:
+    name = tracks
+    library = egs_track_scoring
+  :stop ausgab object:
+
+  # Dose scoring object
+  :start ausgab object:
+    name = dose
+    library = egs_dose_scoring
+    dose regions = 1
+    volume = 10
+  :stop ausgab object:
+:stop ausgab object definition:
