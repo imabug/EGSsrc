@@ -1,2 +1,2 @@
 # EGSsrc
-EGSnrc simulations
+A collection of EGSnrc simulations created for my PhD projects and dissertation.
